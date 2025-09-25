@@ -95,7 +95,7 @@ $stmt->bind_param("ssssss", $email, $register_date, $phone_number, $password, $m
 </head>
 
 <div class="wrapper">
-    <h1>Johnny's Dining & Bar</h1>
+    <h1>Restaurant Halal Asia</h1>
     <h3>Create New Member Account</h3>
     <p>Please fill in Account Information Properly</p>
 

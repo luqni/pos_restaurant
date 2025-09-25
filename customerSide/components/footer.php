@@ -24,7 +24,7 @@
           
         
       </div>
-      <p>© <?= date('Y') ?> Johnny's Dining & Bar</p>
+      <p>© <?= date('Y') ?> Restaurant Halal Asia</p>
       
       
     </div>

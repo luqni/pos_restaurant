@@ -58,7 +58,7 @@ session_start();
     <div class="member-info"></div>
     <div class="reserve-container">
         <a class="nav-link" href="../home/home.php#hero">
-            <h1 class="text-center" style="font-family: Copperplate; color: whitesmoke;">JOHNNY'S</h1>
+            <h1 class="text-center" style="font-family: Copperplate; color: whitesmoke;">Restaurant</h1>
             <span class="sr-only"></span>
         </a>
 
