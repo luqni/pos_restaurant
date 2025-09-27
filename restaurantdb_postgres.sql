@@ -1,6 +1,5 @@
 -- Buat database
 CREATE DATABASE restaurantdb;
-\c restaurantdb;
 
 -- Tabel menu
 CREATE TABLE menu (
