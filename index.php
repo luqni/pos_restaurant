@@ -19,7 +19,7 @@ if (file_exists('setup_completed.flag')) {
         if ($dbDriver === 'mysql') {
             $dsn = "mysql:host=$dbHost;port=$dbPort;charset=utf8mb4";
         } elseif ($dbDriver === 'pgsql') {
-            $dsn = "pgsql:host=$dbHost;port=$dbPort";
+            $dsn = "pgsql:host=$dbHost;port=$dbPort;dbname=postgres"; // konek dulu ke DB default
         } elseif ($dbDriver === 'sqlite') {
             $dsn = "sqlite:$dbName";
         } else {
@@ -33,31 +33,20 @@ if (file_exists('setup_completed.flag')) {
 
         echo "Koneksi berhasil ke server DB dengan driver $dbDriver.<br>";
 
-        if ($dbDriver === 'pgsql') {
-            try {
-                $pdo->exec("ALTER DATABASE template1 REFRESH COLLATION VERSION");
-                $pdo->exec("ALTER DATABASE postgres REFRESH COLLATION VERSION");
-            } catch (Exception $e) {
-                echo "Warning: " . $e->getMessage() . "<br>";
-            }
-        }        
-
         // Buat database kalau MySQL atau PostgreSQL
-        if (in_array($dbDriver, ['mysql', 'pgsql'])) {
-            $sqlCreateDB = "CREATE DATABASE IF NOT EXISTS $dbName";
-            if ($dbDriver === 'pgsql') {
-                // PostgreSQL tidak dukung `IF NOT EXISTS` dengan cara sama
-                $sqlCreateDB = "SELECT 1 FROM pg_database WHERE datname='$dbName'";
-                $stmt = $pdo->query($sqlCreateDB);
-                if (!$stmt->fetch()) {
-                    $pdo->exec("CREATE DATABASE $dbName");
-                    echo "Database '$dbName' created successfully.<br>";
-                } else {
-                    echo "Database '$dbName' already exists.<br>";
-                }
-            } else {
-                $pdo->exec($sqlCreateDB);
+        if ($dbDriver === 'mysql') {
+            $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;");
+            echo "Database '$dbName' created successfully.<br>";
+        } elseif ($dbDriver === 'pgsql') {
+            // cek apakah DB sudah ada
+            $stmt = $pdo->prepare("SELECT 1 FROM pg_database WHERE datname = :dbname");
+            $stmt->execute([':dbname' => $dbName]);
+
+            if (!$stmt->fetch()) {
+                $pdo->exec("CREATE DATABASE \"$dbName\";");
                 echo "Database '$dbName' created successfully.<br>";
+            } else {
+                echo "Database '$dbName' already exists.<br>";
             }
         }
 
@@ -74,7 +63,12 @@ if (file_exists('setup_completed.flag')) {
 
         // Jalankan SQL dari file
         function executeSQLFromFile($filename, $pdo) {
+            if (!file_exists($filename)) {
+                echo "SQL file $filename not found.<br>";
+                return;
+            }
             $sql = file_get_contents($filename);
+
             try {
                 $pdo->exec($sql);
                 echo "SQL statements executed successfully.<br>";
