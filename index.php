@@ -15,18 +15,18 @@ if (file_exists('setup_completed.flag')) {
     $dbName   = getenv('DB_NAME') ?: 'restaurantdb';
 
     try {
-        // Buat DSN sesuai driver
+        // Buat DSN sesuai driver (koneksi awal tanpa DB_NAME)
         if ($dbDriver === 'mysql') {
             $dsn = "mysql:host=$dbHost;port=$dbPort;charset=utf8mb4";
         } elseif ($dbDriver === 'pgsql') {
-            $dsn = "pgsql:host=$dbHost;port=$dbPort;dbname=postgres"; // konek dulu ke DB default
+            $dsn = "pgsql:host=$dbHost;port=$dbPort;dbname=postgres"; // connect ke DB default postgres
         } elseif ($dbDriver === 'sqlite') {
             $dsn = "sqlite:$dbName";
         } else {
             throw new Exception("Driver $dbDriver belum didukung.");
         }
 
-        // Koneksi ke server DB (tanpa DB_NAME dulu untuk create database)
+        // Koneksi ke server DB
         $pdo = new PDO($dsn, $dbUser, $dbPass, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         ]);
@@ -38,7 +38,6 @@ if (file_exists('setup_completed.flag')) {
             $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;");
             echo "Database '$dbName' created successfully.<br>";
         } elseif ($dbDriver === 'pgsql') {
-            // cek apakah DB sudah ada
             $stmt = $pdo->prepare("SELECT 1 FROM pg_database WHERE datname = :dbname");
             $stmt->execute([':dbname' => $dbName]);
 
@@ -67,18 +66,28 @@ if (file_exists('setup_completed.flag')) {
                 echo "SQL file $filename not found.<br>";
                 return;
             }
+
             $sql = file_get_contents($filename);
 
             try {
                 $pdo->exec($sql);
-                echo "SQL statements executed successfully.<br>";
+                echo "SQL from $filename executed successfully.<br>";
                 file_put_contents('setup_completed.flag', 'Setup completed successfully.');
             } catch (PDOException $e) {
-                echo "Error executing SQL: " . $e->getMessage() . "<br>";
+                echo "Error executing SQL in $filename: " . $e->getMessage() . "<br>";
             }
         }
 
-        executeSQLFromFile('restaurantdb.txt', $pdo);
+        // Tentukan file SQL sesuai driver
+        if ($dbDriver === 'mysql') {
+            $sqlFile = __DIR__ . '/restaurantdb_mysql.sql';
+        } elseif ($dbDriver === 'pgsql') {
+            $sqlFile = __DIR__ . '/restaurantdb_postgres.sql';
+        } else {
+            $sqlFile = __DIR__ . '/restaurantdb.txt'; // fallback
+        }
+
+        executeSQLFromFile($sqlFile, $pdo);
 
     } catch (PDOException $e) {
         die("Koneksi gagal: " . $e->getMessage());
