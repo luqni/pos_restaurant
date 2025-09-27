@@ -249,28 +249,28 @@ ON CONFLICT DO NOTHING;
 -- ON CONFLICT DO NOTHING;
 
 -- memberships table
-INSERT INTO memberships (member_name, points,account_id) VALUES 
-('Abbel TuTuTu', 100,11),
-('Abignail Downey ', 200,12),
-('Jamie Mustafa', 300,13),
-('Luke Gun Slinger', 400,14),
-('Johny Rings', 500,15),
-('Wee Tuu Low', 600,16),
-('Sum Ting Wong', 700,17),
-('Ho Lee Fuk', 800,18),
-('Bang Ding Ow', 900,19),
-('Rocky Rocket', 1000,20),	
-('Robber Hellington', 250, 21),
-('Jean Ng', 300, 22),
-('Emily Davis', 400, 23),
-('Robert Wilson', 550, 24),
-('Zoe Chong', 650, 25),
-('Lisa Chia', 750, 26),
-('Taylor Swift', 900, 27),
-('Stephan Curry', 1050, 28),
-('Bruce Lee', 1200, 29),
-('Jackie Chan', 1350, 30)
-ON CONFLICT DO NOTHING;
+-- INSERT INTO memberships (member_name, points,account_id) VALUES 
+-- ('Abbel TuTuTu', 100,11),
+-- ('Abignail Downey ', 200,12),
+-- ('Jamie Mustafa', 300,13),
+-- ('Luke Gun Slinger', 400,14),
+-- ('Johny Rings', 500,15),
+-- ('Wee Tuu Low', 600,16),
+-- ('Sum Ting Wong', 700,17),
+-- ('Ho Lee Fuk', 800,18),
+-- ('Bang Ding Ow', 900,19),
+-- ('Rocky Rocket', 1000,20),	
+-- ('Robber Hellington', 250, 21),
+-- ('Jean Ng', 300, 22),
+-- ('Emily Davis', 400, 23),
+-- ('Robert Wilson', 550, 24),
+-- ('Zoe Chong', 650, 25),
+-- ('Lisa Chia', 750, 26),
+-- ('Taylor Swift', 900, 27),
+-- ('Stephan Curry', 1050, 28),
+-- ('Bruce Lee', 1200, 29),
+-- ('Jackie Chan', 1350, 30)
+-- ON CONFLICT DO NOTHING;
 
 
 
