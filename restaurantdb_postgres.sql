@@ -1,8 +1,5 @@
--- Buat database
-CREATE DATABASE restaurantdb;
-
 -- Tabel menu
-CREATE TABLE menu (
+CREATE TABLE IF NOT EXISTS menu (
   item_id VARCHAR(6) PRIMARY KEY,
   item_name VARCHAR(255),
   item_type VARCHAR(255),
@@ -12,7 +9,7 @@ CREATE TABLE menu (
 );
 
 -- Tabel accounts
-CREATE TABLE accounts (
+CREATE TABLE IF NOT EXISTS accounts (
   account_id SERIAL PRIMARY KEY,
   email VARCHAR(255),
   register_date DATE,
@@ -21,7 +18,7 @@ CREATE TABLE accounts (
 );
 
 -- Tabel staffs
-CREATE TABLE staffs (
+CREATE TABLE IF NOT EXISTS staffs (
   staff_id SERIAL PRIMARY KEY,
   staff_name VARCHAR(255),
   role VARCHAR(255),
@@ -29,7 +26,7 @@ CREATE TABLE staffs (
 );
 
 -- Tabel memberships
-CREATE TABLE memberships (
+CREATE TABLE IF NOT EXISTS memberships (
   member_id SERIAL PRIMARY KEY,
   member_name VARCHAR(255),
   points INT,
@@ -37,14 +34,14 @@ CREATE TABLE memberships (
 );
 
 -- Tabel meja restoran
-CREATE TABLE restaurant_tables (
+CREATE TABLE IF NOT EXISTS restaurant_tables (
   table_id SERIAL PRIMARY KEY,
   capacity INT,
   is_available BOOLEAN DEFAULT true
 );
 
 -- Tabel ketersediaan meja
-CREATE TABLE table_availability (
+CREATE TABLE IF NOT EXISTS table_availability (
   availability_id SERIAL PRIMARY KEY,
   table_id INT REFERENCES restaurant_tables(table_id),
   reservation_date DATE,
@@ -53,8 +50,8 @@ CREATE TABLE table_availability (
 );
 
 -- Tabel reservasi
-CREATE TABLE reservations (
-  reservation_id INT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS reservations (
+  reservation_id SERIAL PRIMARY KEY,
   customer_name VARCHAR(255),
   table_id INT REFERENCES restaurant_tables(table_id),
   reservation_time TIME,
@@ -64,7 +61,7 @@ CREATE TABLE reservations (
 );
 
 -- Tabel pembayaran kartu
-CREATE TABLE card_payments (
+CREATE TABLE IF NOT EXISTS card_payments (
     card_id SERIAL PRIMARY KEY,
     account_holder_name VARCHAR(255) NOT NULL,
     card_number VARCHAR(16) NOT NULL,
@@ -73,7 +70,7 @@ CREATE TABLE card_payments (
 );
 
 -- Tabel bills
-CREATE TABLE bills (
+CREATE TABLE IF NOT EXISTS bills (
   bill_id SERIAL PRIMARY KEY,
   staff_id INT REFERENCES staffs(staff_id),
   member_id INT REFERENCES memberships(member_id),
@@ -86,7 +83,7 @@ CREATE TABLE bills (
 );
 
 -- Tabel detail bill
-CREATE TABLE bill_items (
+CREATE TABLE IF NOT EXISTS bill_items (
   bill_item_id SERIAL PRIMARY KEY,
   bill_id INT REFERENCES bills(bill_id),
   item_id VARCHAR(6) REFERENCES menu(item_id),
@@ -94,7 +91,7 @@ CREATE TABLE bill_items (
 );
 
 -- Tabel dapur
-CREATE TABLE kitchen (
+CREATE TABLE IF NOT EXISTS kitchen (
     kitchen_id SERIAL PRIMARY KEY,
     table_id INT REFERENCES restaurant_tables(table_id),
     item_id VARCHAR(6) REFERENCES menu(item_id),
@@ -103,20 +100,21 @@ CREATE TABLE kitchen (
     time_ended TIMESTAMP
 );
 
--- Seed Data
-INSERT INTO restaurant_tables (table_id, capacity, is_available) VALUES
-(1, 4, true),
-(2, 4, true),
-(3, 4, true),
-(4, 6, true),
-(5, 6, true),
-(6, 6, true),
-(7, 6, true),
-(8, 8, true),
-(9, 8, true),
-(10, 8, true);
+-- Seed Data Meja
+INSERT INTO restaurant_tables (capacity, is_available) VALUES
+(4, true),
+(4, true),
+(4, true),
+(6, true),
+(6, true),
+(6, true),
+(6, true),
+(8, true),
+(8, true),
+(8, true)
+ON CONFLICT DO NOTHING;
 
--- Insert Menu
+-- Seed Data Menu
 INSERT INTO menu (item_id, item_name, item_type, item_category, item_price, item_description) VALUES
 ('ID1', 'Nasi Goreng Spesial', 'Indonesian Food', 'Main Dishes', 28, 'Nasi goreng dengan telur, ayam, dan sate'),
 ('ID2', 'Sate Ayam', 'Indonesian Food', 'Main Dishes', 32, 'Tusuk sate ayam dengan bumbu kacang'),
@@ -148,4 +146,5 @@ INSERT INTO menu (item_id, item_name, item_type, item_category, item_price, item
 ('DR2', 'Es Teh Manis', 'Drinks', 'Drinks', 5, 'Teh manis dingin'),
 ('DR3', 'Es Jeruk', 'Drinks', 'Drinks', 6, 'Jeruk peras segar'),
 ('DR4', 'Jus Alpukat', 'Drinks', 'Drinks', 18, 'Jus alpukat kental dengan coklat'),
-('DR5', 'Air Mineral', 'Drinks', 'Drinks', 3, 'Air mineral dingin');
+('DR5', 'Air Mineral', 'Drinks', 'Drinks', 3, 'Air mineral dingin')
+ON CONFLICT DO NOTHING;
