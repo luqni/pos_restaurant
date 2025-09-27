@@ -33,6 +33,15 @@ if (file_exists('setup_completed.flag')) {
 
         echo "Koneksi berhasil ke server DB dengan driver $dbDriver.<br>";
 
+        if ($dbDriver === 'pgsql') {
+            try {
+                $pdo->exec("ALTER DATABASE template1 REFRESH COLLATION VERSION");
+                $pdo->exec("ALTER DATABASE postgres REFRESH COLLATION VERSION");
+            } catch (Exception $e) {
+                echo "Warning: " . $e->getMessage() . "<br>";
+            }
+        }        
+
         // Buat database kalau MySQL atau PostgreSQL
         if (in_array($dbDriver, ['mysql', 'pgsql'])) {
             $sqlCreateDB = "CREATE DATABASE IF NOT EXISTS $dbName";
