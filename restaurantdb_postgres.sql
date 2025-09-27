@@ -236,17 +236,17 @@ ON CONFLICT DO NOTHING;
 
 
 -- staffs table
-INSERT INTO staffs (staff_name, role, account_id) VALUES ('John Smith', 'Waiter', 1),
-('Susan Johnson', 'Waiter', 2),
-('James Brown', 'Waiter', 3),
-('Alice Davis', 'Waiter', 4),
-('Mike Wilson', 'Waiter', 5),
-('Lisa Martinez', 'Chef', 6),
-('Robert Miller', 'Manager', 7),
-('Emily Moore', 'Manager', 8),
-('David Taylor', 'Chef', 9),
-('Olivia Anderson', 'Chef', 10)
-ON CONFLICT DO NOTHING;
+-- INSERT INTO staffs (staff_name, role, account_id) VALUES ('John Smith', 'Waiter', 1),
+-- ('Susan Johnson', 'Waiter', 2),
+-- ('James Brown', 'Waiter', 3),
+-- ('Alice Davis', 'Waiter', 4),
+-- ('Mike Wilson', 'Waiter', 5),
+-- ('Lisa Martinez', 'Chef', 6),
+-- ('Robert Miller', 'Manager', 7),
+-- ('Emily Moore', 'Manager', 8),
+-- ('David Taylor', 'Chef', 9),
+-- ('Olivia Anderson', 'Chef', 10)
+-- ON CONFLICT DO NOTHING;
 
 -- memberships table
 INSERT INTO memberships (member_name, points,account_id) VALUES 
