@@ -149,6 +149,58 @@ INSERT INTO menu (item_id, item_name, item_type, item_category, item_price, item
 ('DR5', 'Air Mineral', 'Drinks', 'Drinks', 3, 'Air mineral dingin')
 ON CONFLICT DO NOTHING;
 
+-- =======================================
+-- Extra Dummy Menu (for bill_items FK)
+-- =======================================
+INSERT INTO menu (item_id, item_name, item_type, item_category, item_price, item_description) VALUES
+('MD1', 'Menu Dummy 1', 'Main Dishes', 'Dummy', 25, 'Auto generated menu item for bill'),
+('MD2', 'Menu Dummy 2', 'Main Dishes', 'Dummy', 28, 'Auto generated menu item for bill'),
+('MD4', 'Menu Dummy 4', 'Main Dishes', 'Dummy', 30, 'Auto generated menu item for bill'),
+('MD5', 'Menu Dummy 5', 'Main Dishes', 'Dummy', 32, 'Auto generated menu item for bill'),
+('MD9', 'Menu Dummy 9', 'Main Dishes', 'Dummy', 34, 'Auto generated menu item for bill'),
+('MD15', 'Menu Dummy 15', 'Main Dishes', 'Dummy', 36, 'Auto generated menu item for bill'),
+('MD16', 'Menu Dummy 16', 'Main Dishes', 'Dummy', 38, 'Auto generated menu item for bill'),
+('MD19', 'Menu Dummy 19', 'Main Dishes', 'Dummy', 40, 'Auto generated menu item for bill'),
+('MD21', 'Menu Dummy 21', 'Main Dishes', 'Dummy', 42, 'Auto generated menu item for bill'),
+('MD23', 'Menu Dummy 23', 'Main Dishes', 'Dummy', 44, 'Auto generated menu item for bill'),
+('MD29', 'Menu Dummy 29', 'Main Dishes', 'Dummy', 46, 'Auto generated menu item for bill'),
+('MD32', 'Menu Dummy 32', 'Main Dishes', 'Dummy', 48, 'Auto generated menu item for bill'),
+('MD33', 'Menu Dummy 33', 'Main Dishes', 'Dummy', 50, 'Auto generated menu item for bill'),
+('MD41', 'Menu Dummy 41', 'Main Dishes', 'Dummy', 52, 'Auto generated menu item for bill'),
+('MD42', 'Menu Dummy 42', 'Main Dishes', 'Dummy', 54, 'Auto generated menu item for bill'),
+('S1', 'Side Dummy 1', 'Side Dishes', 'Dummy', 10, 'Auto generated menu item for bill'),
+('S3', 'Side Dummy 3', 'Side Dishes', 'Dummy', 12, 'Auto generated menu item for bill'),
+('S4', 'Side Dummy 4', 'Side Dishes', 'Dummy', 14, 'Auto generated menu item for bill'),
+('S5', 'Side Dummy 5', 'Side Dishes', 'Dummy', 16, 'Auto generated menu item for bill'),
+('S6', 'Side Dummy 6', 'Side Dishes', 'Dummy', 18, 'Auto generated menu item for bill'),
+('S8', 'Side Dummy 8', 'Side Dishes', 'Dummy', 20, 'Auto generated menu item for bill'),
+('L1', 'Large Dummy 1', 'Large Meals', 'Dummy', 22, 'Auto generated menu item for bill'),
+('L2', 'Large Dummy 2', 'Large Meals', 'Dummy', 24, 'Auto generated menu item for bill'),
+('L3', 'Large Dummy 3', 'Large Meals', 'Dummy', 26, 'Auto generated menu item for bill'),
+('L5', 'Large Dummy 5', 'Large Meals', 'Dummy', 28, 'Auto generated menu item for bill'),
+('HC2', 'Hot Combo 2', 'Combo', 'Dummy', 30, 'Auto generated menu item for bill'),
+('HC3', 'Hot Combo 3', 'Combo', 'Dummy', 32, 'Auto generated menu item for bill'),
+('HC4', 'Hot Combo 4', 'Combo', 'Dummy', 34, 'Auto generated menu item for bill'),
+('HC5', 'Hot Combo 5', 'Combo', 'Dummy', 36, 'Auto generated menu item for bill'),
+('C1', 'Combo 1', 'Combo', 'Dummy', 38, 'Auto generated menu item for bill'),
+('C2', 'Combo 2', 'Combo', 'Dummy', 40, 'Auto generated menu item for bill'),
+('C3', 'Combo 3', 'Combo', 'Dummy', 42, 'Auto generated menu item for bill'),
+('C4', 'Combo 4', 'Combo', 'Dummy', 44, 'Auto generated menu item for bill'),
+('SK3', 'Snack 3', 'Snacks', 'Dummy', 12, 'Auto generated menu item for bill'),
+('SK6', 'Snack 6', 'Snacks', 'Dummy', 14, 'Auto generated menu item for bill'),
+('CP1', 'Cold Pack 1', 'Drinks', 'Dummy', 15, 'Auto generated menu item for bill'),
+('CP2', 'Cold Pack 2', 'Drinks', 'Dummy', 16, 'Auto generated menu item for bill'),
+('CP3', 'Cold Pack 3', 'Drinks', 'Dummy', 17, 'Auto generated menu item for bill'),
+('CP4', 'Cold Pack 4', 'Drinks', 'Dummy', 18, 'Auto generated menu item for bill'),
+('CP5', 'Cold Pack 5', 'Drinks', 'Dummy', 19, 'Auto generated menu item for bill'),
+('M1', 'Meal 1', 'Main Dishes', 'Dummy', 20, 'Auto generated menu item for bill'),
+('M2', 'Meal 2', 'Main Dishes', 'Dummy', 22, 'Auto generated menu item for bill'),
+('M4', 'Meal 4', 'Main Dishes', 'Dummy', 24, 'Auto generated menu item for bill'),
+('M5', 'Meal 5', 'Main Dishes', 'Dummy', 26, 'Auto generated menu item for bill'),
+('M6', 'Meal 6', 'Main Dishes', 'Dummy', 28, 'Auto generated menu item for bill'),
+('HD1', 'Hot Dish 1', 'Main Dishes', 'Dummy', 30, 'Auto generated menu item for bill')
+ON CONFLICT DO NOTHING;
+
 INSERT INTO accounts (email, register_date, phone_number, password) VALUES 
 ('john@gmail.com', '2023-08-31', '+1234567890', 'password123'),
 ('susan@gmail.com', '2023-08-30', '+1987654321', 'susanpassword'),
