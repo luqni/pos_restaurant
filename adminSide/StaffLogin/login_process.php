@@ -1,75 +1,67 @@
 <?php
 session_start(); // Ensure session is started
-?>
-<?php
-require_once "../config.php";
-
+require_once "../config.php"; // Di dalam config sudah ada $pdo (PDO connection)
 
 // Check if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // User-provided input
-    $provided_account_id = $_POST['account_id'];
-    $provided_password = $_POST['password'];
+    $provided_account_id = $_POST['account_id'] ?? '';
+    $provided_password   = $_POST['password'] ?? '';
 
-    // Query to fetch staff record based on provided account_id
-    $query = "SELECT * FROM accounts WHERE account_id = '$provided_account_id'";
-    $result = $link->query($query);
+    try {
+        // Query to fetch staff record based on provided account_id
+        $stmt = $pdo->prepare("SELECT * FROM accounts WHERE account_id = :account_id");
+        $stmt->execute(['account_id' => $provided_account_id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($result->num_rows === 1) {
-        $row = $result->fetch_assoc();
-        $stored_password = $row['password'];
+        if ($row) {
+            $stored_password = $row['password'];
 
-        if ($provided_password === $stored_password) {
-        // Password matches, login successful
+            // ⚠️ Catatan: sebaiknya gunakan password_hash + password_verify
+            if ($provided_password === $stored_password) {
+                // Cek staff di tabel staffs
+                $staff_stmt = $pdo->prepare("SELECT * FROM staffs WHERE account_id = :account_id");
+                $staff_stmt->execute(['account_id' => $provided_account_id]);
+                $staff_row = $staff_stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Check if the account_id exists in the staffs table
-        $staff_query = "SELECT * FROM staffs WHERE account_id = '$provided_account_id'";
-        $staff_result = $link->query($staff_query);
+                if ($staff_row) {
+                    $logged_staff_name = $staff_row['staff_name'];
 
-        if ($staff_result->num_rows === 1) {
-            $staff_row = $staff_result->fetch_assoc();
-            $logged_staff_name = $staff_row['staff_name']; // Get staff_name
-            //$message = "Login successful.<br> Welcome to Restaurant Staff Panel.";
-            //$iconClass = "fa-check-circle";
-            //$cardClass = "alert-success";
-            //$bgColor = "#D4F4DD";
-            //$direction = "../panel/pos-panel.php"; // Success, go to staff panel
-            
-            // After successful login, store staff_name in session
-            $_SESSION['logged_account_id'] = $provided_account_id;
-            $_SESSION['logged_staff_name'] = $logged_staff_name;
-            
-            //Directly go to the pos panel upon successful login
-            header("Location: ../panel/pos-panel.php");
-            exit;
-            
+                    // Simpan session
+                    $_SESSION['logged_account_id'] = $provided_account_id;
+                    $_SESSION['logged_staff_name'] = $logged_staff_name;
+
+                    // Redirect langsung ke panel
+                    header("Location: ../panel/pos-panel.php");
+                    exit;
+                } else {
+                    $message   = "Staff ID not found.<br>Please try again to choose a correct Staff ID.";
+                    $iconClass = "fa-times-circle";
+                    $cardClass = "alert-danger";
+                    $bgColor   = "#FFA7A7";
+                    $direction = "login.php";
+                }
+            } else {
+                $message   = "Incorrect password.<br>Please try again to type your password.";
+                $iconClass = "fa-times-circle";
+                $cardClass = "alert-danger";
+                $bgColor   = "#FFA7A7";
+                $direction = "login.php";
+            }
         } else {
-            // Staff ID not found in staffs table
-            $message = "Staff ID not found.<br>Please try again to choose a correct Staff ID.";
+            $message   = "Staff ID not found.<br>Please try again to choose a correct Staff ID.";
             $iconClass = "fa-times-circle";
             $cardClass = "alert-danger";
-            $bgColor = "#FFA7A7"; // Custom background color for error
-            $direction = "login.php"; // Fail, go back to login
-            }      
-            
-        } else {
-            $message = "Incorrect password.<br>Please try again to type your password.";
-            $iconClass = "fa-times-circle";
-            $cardClass = "alert-danger";
-            $bgColor = "#FFA7A7"; // Custom background color for error
-            $direction = "login.php"; //Fail back to login
+            $bgColor   = "#FFA7A7";
+            $direction = "login.php";
         }
-    } else {
-        $message = "Staff ID not found.<br>Please try again to choose a correct Staff ID.";
+    } catch (PDOException $e) {
+        $message   = "Database error: " . htmlspecialchars($e->getMessage());
         $iconClass = "fa-times-circle";
         $cardClass = "alert-danger";
-        $bgColor = "#FFA7A7";
-        $direction = "login.php"; //Fail back to login
+        $bgColor   = "#FFA7A7";
+        $direction = "login.php";
     }
 }
-
-// Close the database connection
-$link->close();
 ?>
 
 <!DOCTYPE html>

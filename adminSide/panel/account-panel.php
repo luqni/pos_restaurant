@@ -34,32 +34,27 @@ require_once '../posBackend/checkIfLoggedIn.php';
                 </div>
                 
                 <?php
-                // Include config file
+                // Include config file (PDO connection: $pdo)
                 require_once "../config.php";
 
-                if (isset($_POST['search'])) {
-                    if (!empty($_POST['search'])) {
-                        $search = $_POST['search'];
-
+                try {
+                    if (isset($_POST['search']) && !empty($_POST['search'])) {
+                        $search = "%" . $_POST['search'] . "%";
                         $sql = "SELECT *
                                 FROM accounts
-                                WHERE email LIKE '%$search%' OR account_id LIKE '%$search%'
-                                ORDER BY account_id;";
+                                WHERE email LIKE :search OR account_id LIKE :search
+                                ORDER BY account_id";
+                        $stmt = $pdo->prepare($sql);
+                        $stmt->bindParam(':search', $search, PDO::PARAM_STR);
+                        $stmt->execute();
                     } else {
-                        // Default query to fetch all accounts
-                        $sql = "SELECT *
-                                FROM accounts
-                                ORDER BY account_id;";
+                        $sql = "SELECT * FROM accounts ORDER BY account_id";
+                        $stmt = $pdo->query($sql);
                     }
-                } else {
-                    // Default query to fetch all accounts
-                    $sql = "SELECT *
-                            FROM accounts
-                            ORDER BY account_id;";
-                }
 
-                if ($result = mysqli_query($link, $sql)) {
-                    if (mysqli_num_rows($result) > 0) {
+                    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                    if ($results && count($results) > 0) {
                         echo '<table class="table table-bordered table-striped">';
                         echo "<thead>";
                         echo "<tr>";
@@ -68,39 +63,28 @@ require_once '../posBackend/checkIfLoggedIn.php';
                         echo "<th>Register Date</th>";
                         echo "<th>Phone Number</th>";
                         echo "<th>Password</th>";
-                        //echo "<th>Account Type</th>"; // Display account type
-                       // echo "<th>Delete</th>";
                         echo "</tr>";
                         echo "</thead>";
                         echo "<tbody>";
-                        while ($row = mysqli_fetch_array($result)) {
+                        foreach ($results as $row) {
                             echo "<tr>";
-                            echo "<td>" . $row['account_id'] . "</td>";
-                            echo "<td>" . $row['email'] . "</td>";
-                            echo "<td>" . $row['register_date'] . "</td>";
-                            echo "<td>" . $row['phone_number'] . "</td>";
-                            echo "<td>" . $row['password'] . "</td>";
-                            //echo "<td>" . ucfirst($row['account_type']) . "</td>"; // Display account type
-                          //  echo "<td>";
-                          //  $deleteSQL = "DELETE FROM accounts WHERE account_id = '" . $row['account_id'] . "';";
-                           // echo '<a href="../accountCrud/deleteAccountVerify.php?id=' . $row['account_id'] . '" title="Delete Record" data-toggle="tooltip" '
-                           //         . 'onclick="return confirm(\'Admin permission Required!\n\nAre you sure you want to delete this Account?\n\nThis will alter other modules related to this Account!\n\')"><span class="fa fa-trash text-black"></span></a>';
-                           // echo "</td>";
+                            echo "<td>" . htmlspecialchars($row['account_id']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['email']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['register_date']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['phone_number']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['password']) . "</td>";
                             echo "</tr>";
                         }
                         echo "</tbody>";
                         echo "</table>";
-                        // Free result set
-                        mysqli_free_result($result);
                     } else {
                         echo '<div class="alert alert-danger"><em>No records were found.</em></div>';
                     }
-                } else {
+                } catch (PDOException $e) {
                     echo "Oops! Something went wrong. Please try again later.";
+                    // Debug (opsional):
+                    // echo $e->getMessage();
                 }
-
-                // Close connection
-                mysqli_close($link);
                 ?>
             </div>
         </div>

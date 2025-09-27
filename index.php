@@ -1,50 +1,85 @@
 <?php
+require_once __DIR__ . '/env_loader.php';
+loadEnv(__DIR__ . '/.env');
+
 // Check if setup has already been completed
 if (file_exists('setup_completed.flag')) {
     echo "Setup has already been completed. The SQL setup won't run again.";
 } else {
-    define('DB_HOST', 'localhost');
-    define('DB_USER', 'root');
-    define('DB_PASS', 'P@ssw0rd');
+    // Ambil konfigurasi dari .env
+    $dbDriver = getenv('DB_DRIVER') ?: 'mysql'; // mysql, pgsql, sqlite, dll
+    $dbHost   = getenv('DB_HOST') ?: 'localhost';
+    $dbPort   = getenv('DB_PORT') ?: ($dbDriver === 'pgsql' ? '5432' : '3306');
+    $dbUser   = getenv('DB_USER') ?: 'root';
+    $dbPass   = getenv('DB_PASS') ?: 'P@ssw0rd';
+    $dbName   = getenv('DB_NAME') ?: 'restaurantdb';
 
-    // Create Connection
-    $link = new mysqli(DB_HOST, DB_USER, DB_PASS);
-
-    // Check Connection
-    if ($link->connect_error) {
-        die('Connection Failed: ' . $link->connect_error);
-    }
-
-    // Create the 'restaurantdb' database if it doesn't exist
-    $sqlCreateDB = "CREATE DATABASE IF NOT EXISTS restaurantdb";
-    if ($link->query($sqlCreateDB) === TRUE) {
-        echo "Database 'restaurantdb' created successfully.<br>";
-    } else {
-        echo "Error creating database: " . $link->error . "<br>";
-    }
-
-    // Switch to using the 'restaurantdb' database
-    $link->select_db('restaurantdb');
-
-    // Execute SQL statements from "restaurantdb.txt"
-    function executeSQLFromFile($filename, $link) {
-        $sql = file_get_contents($filename);
-
-        // Execute the SQL statements
-        if ($link->multi_query($sql) === TRUE) {
-            echo "SQL statements executed successfully.";
-            // Set the flag to indicate setup is complete
-            file_put_contents('setup_completed.flag', 'Setup completed successfully.');
+    try {
+        // Buat DSN sesuai driver
+        if ($dbDriver === 'mysql') {
+            $dsn = "mysql:host=$dbHost;port=$dbPort;charset=utf8mb4";
+        } elseif ($dbDriver === 'pgsql') {
+            $dsn = "pgsql:host=$dbHost;port=$dbPort";
+        } elseif ($dbDriver === 'sqlite') {
+            $dsn = "sqlite:$dbName";
         } else {
-            echo "Error executing SQL statements: " . $link->error;
+            throw new Exception("Driver $dbDriver belum didukung.");
         }
+
+        // Koneksi ke server DB (tanpa DB_NAME dulu untuk create database)
+        $pdo = new PDO($dsn, $dbUser, $dbPass, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        ]);
+
+        echo "Koneksi berhasil ke server DB dengan driver $dbDriver.<br>";
+
+        // Buat database kalau MySQL atau PostgreSQL
+        if (in_array($dbDriver, ['mysql', 'pgsql'])) {
+            $sqlCreateDB = "CREATE DATABASE IF NOT EXISTS $dbName";
+            if ($dbDriver === 'pgsql') {
+                // PostgreSQL tidak dukung `IF NOT EXISTS` dengan cara sama
+                $sqlCreateDB = "SELECT 1 FROM pg_database WHERE datname='$dbName'";
+                $stmt = $pdo->query($sqlCreateDB);
+                if (!$stmt->fetch()) {
+                    $pdo->exec("CREATE DATABASE $dbName");
+                    echo "Database '$dbName' created successfully.<br>";
+                } else {
+                    echo "Database '$dbName' already exists.<br>";
+                }
+            } else {
+                $pdo->exec($sqlCreateDB);
+                echo "Database '$dbName' created successfully.<br>";
+            }
+        }
+
+        // Reconnect langsung ke database spesifik
+        if ($dbDriver === 'mysql') {
+            $dsn = "mysql:host=$dbHost;port=$dbPort;dbname=$dbName;charset=utf8mb4";
+        } elseif ($dbDriver === 'pgsql') {
+            $dsn = "pgsql:host=$dbHost;port=$dbPort;dbname=$dbName";
+        }
+
+        $pdo = new PDO($dsn, $dbUser, $dbPass, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        ]);
+
+        // Jalankan SQL dari file
+        function executeSQLFromFile($filename, $pdo) {
+            $sql = file_get_contents($filename);
+            try {
+                $pdo->exec($sql);
+                echo "SQL statements executed successfully.<br>";
+                file_put_contents('setup_completed.flag', 'Setup completed successfully.');
+            } catch (PDOException $e) {
+                echo "Error executing SQL: " . $e->getMessage() . "<br>";
+            }
+        }
+
+        executeSQLFromFile('restaurantdb.txt', $pdo);
+
+    } catch (PDOException $e) {
+        die("Koneksi gagal: " . $e->getMessage());
     }
-
-    // Execute SQL statements from "restaurantdb.txt"
-    executeSQLFromFile('restaurantdb.txt', $link);
-
-    // Close the database connection
-    $link->close();
 }
 ?>
 
