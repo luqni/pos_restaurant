@@ -82,7 +82,7 @@ if (file_exists('setup_completed.flag')) {
         if ($dbDriver === 'mysql') {
             $sqlFile = __DIR__ . '/restaurantdb_mysql.sql';
         } elseif ($dbDriver === 'pgsql') {
-            $sqlFile = __DIR__ . '/restaurantdb.sql';
+            $sqlFile = __DIR__ . '/restaurantdb_postgres.sql';
         } else {
             $sqlFile = __DIR__ . '/restaurantdb.txt'; // fallback
         }
